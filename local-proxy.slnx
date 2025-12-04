@@ -1,0 +1,9 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="lib-ansi_ui/lib-ansi_ui.vcxproj" Id="44b7b8eb-996a-46b4-8a04-0d608c9be6b6" />
+  <Project Path="local-ip-proxy/local-ip-proxy.vcxproj" Id="0d95620d-e58d-4dd7-84d4-6bf5ac9e30bb" />
+  <Project Path="local-tcp-proxy/local-tcp-proxy.vcxproj" Id="1506273f-7101-4ed0-98d2-4517eb260d45" />
+</Solution>
