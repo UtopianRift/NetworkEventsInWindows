@@ -31,9 +31,14 @@ namespace ansi_ui
             out.push_back(static_cast<char>(0xC0 | ((ch >> 6) & 0x1F)));
             out.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
         } else if (ch <= 0xFFFF) {
-            out.push_back(static_cast<char>(0xE0 | ((ch >> 12) & 0x0F)));
-            out.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
-            out.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+            // Check for UTF-16 surrogate pairs (U+D800 to U+DFFF)
+            if (ch >= 0xD800 && ch <= 0xDFFF) {
+                append_utf8(out, 0xFFFD);  // surrogates are invalid
+            } else {
+                out.push_back(static_cast<char>(0xE0 | ((ch >> 12) & 0x0F)));
+                out.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
+                out.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+            }
         } else if (ch <= 0x10FFFF) {
             out.push_back(static_cast<char>(0xF0 | ((ch >> 18) & 0x07)));
             out.push_back(static_cast<char>(0x80 | ((ch >> 12) & 0x3F)));
