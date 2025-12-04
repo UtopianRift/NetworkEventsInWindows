@@ -24,6 +24,26 @@
 namespace ansi_ui
 {
 
+    inline void append_utf8(std::string& out, uint32_t ch) {
+        if (ch <= 0x7F) {
+            out.push_back(static_cast<char>(ch));
+        } else if (ch <= 0x7FF) {
+            out.push_back(static_cast<char>(0xC0 | ((ch >> 6) & 0x1F)));
+            out.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+        } else if (ch <= 0xFFFF) {
+            out.push_back(static_cast<char>(0xE0 | ((ch >> 12) & 0x0F)));
+            out.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
+            out.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+        } else if (ch <= 0x10FFFF) {
+            out.push_back(static_cast<char>(0xF0 | ((ch >> 18) & 0x07)));
+            out.push_back(static_cast<char>(0x80 | ((ch >> 12) & 0x3F)));
+            out.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
+            out.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+        } else {
+            append_utf8(out, 0xFFFD);
+        }
+    }
+
     class Console
     {
     public:
@@ -119,23 +139,7 @@ namespace ansi_ui
                         line += ansi::set_bg_rgb(c.bg.r, c.bg.g, c.bg.b);
                         curBg = c.bg;
                     }
-                    // simple UTF-8 encode_real for BMP subset
-                    if (char32_t ch = c.ch; ch <= 0x7F) { line.push_back(char(ch)); }
-                    else if (ch <= 0x7FF)
-                    {
-                        line.push_back(char(0xC0 | ((ch >> 6) & 0x1F)));
-                        line.push_back(char(0x80 | (ch & 0x3F)));
-                    }
-                    else if (ch <= 0xFFFF)
-                    {
-                        line.push_back(char(0xE0 | ((ch >> 12) & 0x0F)));
-                        line.push_back(char(0x80 | ((ch >> 6) & 0x3F)));
-                        line.push_back(char(0x80 | (ch & 0x3F)));
-                    }
-                    else
-                    {
-                        line.push_back('?');
-                    }
+                    append_utf8(line, c.ch);
                     first = false;
                 }
                 line += ansi::sgr_reset();
